@@ -2,6 +2,7 @@ package sort;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 public class SortNumbers {
     public static void main(String[] args) throws Exception {
@@ -12,7 +13,9 @@ public class SortNumbers {
         ArrayList<String> nineMobile = new ArrayList<>();
         ArrayList<String> mtel = new ArrayList<>();
 
-        File numberFile = new File("PhoneNumber.txt");
+        Scanner scanner = new Scanner(System.in);
+
+        File numberFile = new File("C:\\Users\\hp\\IdeaProjects\\teamApt\\PhoneNumbers.txt");
         BufferedReader contact = new BufferedReader(new FileReader(numberFile));
         String number;
         while ((number = contact.readLine()) != null) {
@@ -45,5 +48,11 @@ public class SortNumbers {
             }
         }
 
+        System.out.println(" REPORT ");
+        System.out.println(" MTN      " + mtn.size());
+        System.out.println(" Airtel   " + airtel.size());
+        System.out.println(" Globacom " + globacom.size());
+        System.out.println(" 9mobile  " + nineMobile.size());
+        System.out.println(" MTEL     " + globacom.size());
     }
 }
