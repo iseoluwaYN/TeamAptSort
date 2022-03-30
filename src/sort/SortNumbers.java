@@ -1,58 +1,70 @@
 package sort;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
 
 public class SortNumbers {
-    public static void main(String[] args) throws Exception {
+    private static HashMap<String, List<String>> networkPrefixes = new HashMap<>();
+    private static HashMap<String, Integer> networkCount = new HashMap<>();
 
-        ArrayList<String> mtn = new ArrayList<>();
-        ArrayList<String> airtel = new ArrayList<>();
-        ArrayList<String> globacom = new ArrayList<>();
-        ArrayList<String> nineMobile = new ArrayList<>();
-        ArrayList<String> mtel = new ArrayList<>();
-
-        Scanner scanner = new Scanner(System.in);
-
-        File numberFile = new File("C:\\Users\\hp\\IdeaProjects\\teamApt\\PhoneNumbers.txt");
-        BufferedReader contact = new BufferedReader(new FileReader(numberFile));
-        String number;
-        while ((number = contact.readLine()) != null) {
-
-            if (number.startsWith("0703") || number.startsWith("0706") || number.startsWith("0803") || number.startsWith("0806") ||
-                    number.startsWith("0810") || number.startsWith("0813") || number.startsWith("0814") || number.startsWith("0816") ||
-                    number.startsWith("0903") || number.startsWith("0906") || number.startsWith("0913") || number.startsWith("0916") ||
-                    number.startsWith(" 07025") || number.startsWith("07026") || number.startsWith("0704")) {
-                mtn.add(number);
-            }
-
-            if (number.startsWith("0701") || number.startsWith("0708") || number.startsWith("0802") || number.startsWith("0808") ||
-                    number.startsWith("0812") || number.startsWith("0901") || number.startsWith("0902") || number.startsWith("0904") ||
-                    number.startsWith("0907") || number.startsWith("0912")) {
-                airtel.add(number);
-            }
-
-            if (number.startsWith("0705") || number.startsWith("0805") || number.startsWith("0807") || number.startsWith("0811") ||
-                    number.startsWith("0815") || number.startsWith("0905") || number.startsWith("0915")) {
-                globacom.add(number);
-            }
-
-            if (number.startsWith("0809") || number.startsWith("0817") || number.startsWith("0818") || number.startsWith("0909") ||
-                    number.startsWith("0908")) {
-                nineMobile.add(number);
-            }
-
-            if (number.startsWith("0804")) {
-                mtel.add(number);
-            }
+    public static void main(String[] args) {
+        assignValuesToMap();
+        try {
+            BufferedReader reader = readFrom("C:\\Users\\hp\\IdeaProjects\\teamApt\\PhoneNumbers.txt");
+            readEachLine(reader);
+            printNetworkSummary();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
         }
 
-        System.out.println(" REPORT ");
-        System.out.println(" MTN      " + mtn.size());
-        System.out.println(" Airtel   " + airtel.size());
-        System.out.println(" Globacom " + globacom.size());
-        System.out.println(" 9mobile  " + nineMobile.size());
-        System.out.println(" MTEL     " + globacom.size());
+    }
+
+    public static BufferedReader readFrom(String filePath) throws IOException {
+        return Files.newBufferedReader(Paths.get(filePath));
+    }
+
+    public static void readEachLine(BufferedReader reader) throws IOException {
+        reader.lines().forEach(SortNumbers::hasMatchingSubstring);
+    }
+
+    private static <K, V> Stream<Map.Entry<K, V>> mapToStream (Map<K, V> map) {
+        return map.entrySet().stream();
+    }
+
+    private static void hasMatchingSubstring(String line) {
+
+        Stream<Map.Entry<String, List<String>>> stream = mapToStream(networkPrefixes);
+
+        stream.forEach(set -> set.getValue().forEach((prefix) -> {
+                    if (line.startsWith(prefix)) {
+                        networkCount.put(set.getKey(),networkCount.get(set.getKey()) +line.split(",").length);
+                    }
+                })
+        );
+    }
+
+    public static void assignValuesToMap(){
+        networkPrefixes.put("mtn", List.of("0703","0706","0803","0806", "0810", "0813", "0814", "0816", "0903", "0906","0916", "0916", "07025","07026","0704"));
+        networkPrefixes.put("airtel", List.of("0701","0708","0802","0808","0812","0901","0902","0904","0907","0912"));
+        networkPrefixes.put("globacom", List.of("0705","0805","0807","0811","0815","0905","0915"));
+        networkPrefixes.put("etisalat", List.of("0809","0817","0818","0909","0908"));
+
+        networkCount.put("mtn", 0);
+        networkCount.put("airtel", 0);
+        networkCount.put("globacom", 0);
+        networkCount.put("etisalat", 0);
+    }
+
+    private static void printNetworkSummary(){
+        Stream<Map.Entry<String, Integer>> stream = mapToStream(networkCount);
+        stream.forEach(set -> {
+            System.out.println(set.getKey() + "\t| " + set.getValue());
+        });
     }
 }
